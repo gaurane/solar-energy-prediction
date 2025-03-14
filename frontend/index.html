@@ -1,0 +1,50 @@
+%%writefile index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Energy Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>Solar Dashboard</h2>
+        <ul>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Predictions</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Settings</a></li>
+        </ul>
+    </div>
+    
+    <div class="main-content">
+        <h1>Solar Energy Prediction 🌞</h1>
+        
+        <div class="input-section">
+            <input type="text" id="features" placeholder="Enter features (comma-separated)">
+            <button onclick="predict()">Predict</button>
+        </div>
+        
+        <h2 id="result">Prediction: --</h2>
+        
+        <div class="chart-container">
+            <canvas id="energyChart"></canvas>
+        </div>
+
+        <div class="info-section">
+            <div class="info-card">
+                <h3>Battery Level 🔋</h3>
+                <p id="battery-status">N/A</p>
+            </div>
+            <div class="info-card">
+                <h3>Inverter Status ⚡</h3>
+                <p id="inverter-status">N/A</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
