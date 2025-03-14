@@ -1,12 +1,15 @@
-%%writefile script.js
-const API_URL = "http://127.0.0.1:5001";  // Change to deployed API URL later
+// ✅ Replace with your deployed backend URL from Render
+const API_URL = "https://your-app-name.onrender.com";  // Change this to actual API URL
+
+// ✅ Securely Fetch API Key from Environment (if using Vercel)
+const API_KEY = import.meta.env.VITE_API_KEY || "4620e3f7eee6dd16b11907669672adac"; 
 
 async function predict() {
-    const featuresInput = document.getElementById("features").value;
+    const featuresInput = document.getElementById("features").value.trim();
     const features = featuresInput.split(",").map(Number);
 
-    if (features.some(isNaN)) {
-        alert("Please enter valid numbers separated by commas.");
+    if (!featuresInput || features.some(isNaN)) {
+        alert("❌ Please enter valid numbers separated by commas.");
         return;
     }
 
@@ -15,10 +18,14 @@ async function predict() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-API-KEY": "4620e3f7eee6dd16b11907669672adac"
+                "X-API-KEY": API_KEY  // Use secure API key
             },
             body: JSON.stringify({ features })
         });
+
+        if (!response.ok) {
+            throw new Error("⚠️ Server error! Please check API connection.");
+        }
 
         const data = await response.json();
         document.getElementById("result").innerText = `Prediction: ${data.prediction} Watts`;
@@ -26,14 +33,22 @@ async function predict() {
         updateChart(data.prediction);
         updateDeviceStatus(data.prediction);
     } catch (error) {
-        document.getElementById("result").innerText = "Error fetching prediction!";
+        document.getElementById("result").innerText = "⚠️ Error fetching prediction!";
+        console.error("Prediction Error:", error);
     }
 }
 
-// Chart.js - Update Solar Energy Graph
+// ✅ Fix: Prevent Duplicate Chart Rendering
+let chartInstance = null;
+
 function updateChart(prediction) {
     const ctx = document.getElementById("energyChart").getContext("2d");
-    new Chart(ctx, {
+
+    if (chartInstance) {
+        chartInstance.destroy();  // Remove old chart
+    }
+
+    chartInstance = new Chart(ctx, {
         type: "line",
         data: {
             labels: ["Past", "Now", "Future"],
@@ -44,12 +59,16 @@ function updateChart(prediction) {
                 borderColor: "rgba(75, 192, 192, 1)",
                 borderWidth: 2
             }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 }
 
-// Update Battery & Inverter Status
+// ✅ Update Battery & Inverter Status Dynamically
 function updateDeviceStatus(prediction) {
-    document.getElementById("battery-status").innerText = prediction > 50000 ? "Full" : "Charging";
-    document.getElementById("inverter-status").innerText = prediction > 30000 ? "Active" : "Idle";
+    document.getElementById("battery-status").innerText = (prediction > 50000) ? "🔋 Full" : "⚡ Charging";
+    document.getElementById("inverter-status").innerText = (prediction > 30000) ? "🟢 Active" : "🔴 Idle";
 }
